@@ -152,6 +152,5 @@ void leiaFlexivel(){
 
 void loop() { // run over and over
   processEsp();
-  
   leiaFlexivel();
 }
