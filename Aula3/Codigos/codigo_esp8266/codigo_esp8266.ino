@@ -23,8 +23,8 @@
 
 // Update these with values suitable for your network.
 
-const char* ssid = "HCor_Guest";
-const char* password = "hcorwifi";
+const char* ssid = "RedeIoTMetro";
+const char* password = "SenhaFacil";
 const char* mqtt_server = "mqtt.lt.gwachs.com";
 
 
