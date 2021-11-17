@@ -1,0 +1,18 @@
+filebeat.inputs:
+- type: mqtt
+  hosts: 
+    - tcp://mosquitto:1883
+  topics: 
+    - "#"
+
+processors:
+  - convert:
+      fields:
+        - {from: "message", to: "message_float", type: "float"}
+      fail_on_error: false
+
+output.elasticsearch:
+  hosts: [ "elastic:9200"]
+  indices:
+    - index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+

@@ -27,10 +27,13 @@
 */
 #include <SoftwareSerial.h>
 #include <Servo.h>
-Servo servo;
+
+
+
 unsigned long lastMsg = 0;
 int lastFlex = 0;
 SoftwareSerial esp(10, 11); // RX, TX
+Servo s;
 
 void mqttSubscribe(String topic) {
   delay(500);
@@ -63,24 +66,21 @@ void mqttUnsubscribe(String topic) {
 }
 
 void mqttMessage(String topic, String msg) {
-  if (topic == "luz" && msg == "1") {
+  if (topic == "led" && msg == "1") {
     digitalWrite(2, true);
     Serial.println("ligando led");
-  } else if (topic == "luz" && msg == "0") {
+  } else if (topic == "led" && msg == "0") {
     digitalWrite(2, false);
+  }else if(topic == "servo"){
+    int x = msg.toInt();
+    s.write(x);
   }
 
-  if (topic == "braco") {
-    int valor = msg.toInt();
-    servo.write(valor);
-  }
 }
 
 void mqttConnected() {
-  mqttSubscribe("braco");
-  mqttSubscribe("luz");
-
-
+  mqttSubscribe("led");
+  mqttSubscribe("servo");
 }
 
 void setupSerial() {
@@ -130,20 +130,16 @@ void processEsp() {
 }
 
 void setup() {
-  pinMode(2, OUTPUT);
-  pinMode(6, OUTPUT);
   pinMode(4, OUTPUT);
-  servo.attach(6);
-  servo.write(70);
-
+  pinMode(2, OUTPUT);
+  s.attach(6);
   setupSerial();
 }
 
-void leiaFlexivel(){
+void leiaLuz(){
   int x = analogRead(A0);
-  if(millis() - lastMsg > 10000 || abs(lastFlex - x) > 50){
-    esp.println("flexivel|" + String(x));
-    lastFlex = x;
+  if(millis() - lastMsg > 10000){
+    esp.println("luz|" + String(x));
     Serial.println(String(x));
     lastMsg = millis();
   }
@@ -152,5 +148,5 @@ void leiaFlexivel(){
 
 void loop() { // run over and over
   processEsp();
-  leiaFlexivel();
+  leiaLuz();
 }
