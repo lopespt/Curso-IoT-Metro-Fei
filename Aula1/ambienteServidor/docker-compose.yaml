@@ -12,6 +12,7 @@ services:
     image: nodered/node-red
     environment:
       - TZ=America/Sao_Paulo
+      - NODE_RED_ENABLE_PROJECTS=true
     external_links:
       - n8n:n8n
       - elastic:elastic
@@ -21,8 +22,6 @@ services:
       - 1880:1880
     volumes:
       - ./node_red_volume/:/data
-    environment:
-      - NODE_RED_ENABLE_PROJECTS=true
   n8n:
     image: n8nio/n8n
     volumes:
@@ -38,6 +37,16 @@ services:
     ports:
       - 9200:9200
       - 9300:9300
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.14.0
+    command: ["--strict.perms=false"]
+    environment:
+      - ELASTICSEARCH_HOST=elastic
+    external_links:
+      - elastic:elastic
+      - mosquitto:mosquitto
+    volumes:
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
   grafana:
     image: grafana/grafana
     ports:
